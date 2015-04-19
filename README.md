@@ -7,7 +7,9 @@ A simple linear regression machine learning program, written in Python 3.4.1
 * Docopt: http://www.docopt.org/
 
 ## Data Formatting
-Comma separated numbers, with category being the first number. With 3 categories, represent each category as 1, 2, or 3.
+Comma separated numbers, with category being the first number. For example, with 3 categories, represent each category as 1, 2, or 3.
+
+Category must be an integer.
 
 ```
 1,5.1,3.5,1.4,0.2

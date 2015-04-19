@@ -19,7 +19,7 @@ class DataMismatchError(Exception):
         return repr(self.value)
 
 def parse_matrix(line, min_values, max_values):
-    """Returns the two matrices x_i and y_i needed for linear regression parsed
+    """Returns the two vectors x_i and y_i needed for linear regression parsed
     from a line containing comma separated data with the first number
     representing the category as an integer.
 
@@ -34,6 +34,21 @@ def parse_matrix(line, min_values, max_values):
     For x_i, each attribute 'a' is scaled according to the passed in lists.
     [min[a], max[a]] is scaled to [0, 1] and any particular 'a' is set to the
     representative value on that number line.
+    x_i then becomes a vector of scaled attributes, with a 1 at the top
+    for offset purposes.
+    x_i = [1
+           scaled_a1
+           scaled_a2
+           scaled_a3
+           ...
+           scaled_an]
+
+    y_i is a vector of (max_values[0] - min_values[0] + 1) entries where
+    every entry except line[0] equals 0, and the line[0] entry equals 1.
+    For example, if min_values[0] == 1 and max_values[0] == 3 and line[0] == 2
+    y_i = [0
+           1
+           0]
     """
     x_i = [1]
     line = line.strip('\n')
@@ -43,7 +58,7 @@ def parse_matrix(line, min_values, max_values):
         if index == 0:
             value = int(value)
             y_i = []
-            for i in range(0, int(max_values[0])):
+            for i in range(0, int(max_values[0] - min_values[0] + 1)):
                 y_i.append(0)
             try:
                 y_i[value-1] = 1
