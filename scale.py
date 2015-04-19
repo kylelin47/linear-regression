@@ -9,13 +9,18 @@ Options:
 from docopt import docopt
 
 def scale(filename):
+    """Returns two lists, the first containing the minimum and the second
+    containing the maximum values of the attributes.
+
+    The index represents which attribute.
+    """
     min_values = []
     max_values = []
     f = open(filename, 'r')
     for line in f:
         line = line.strip('\n')
         line_separated = line.split(',')
-        for index, value in enumerate(line_separated[1:]):
+        for index, value in enumerate(line_separated):
             if len(min_values) <= index:
                 min_values.append(float('inf'))
                 max_values.append(float('-inf'))
