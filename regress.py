@@ -57,29 +57,27 @@ if __name__ == "__main__":
     args = docopt(__doc__)
     min_values, max_values = scale(args['TRAINING_SET'])
 
-    training_file = open(args['TRAINING_SET'], 'r')
-    for line in training_file:
-        x_i, y_i = parse_matrix(line, min_values, max_values)
-        try:
-            sum_xi += x_i * x_i.T
-            sum_yi += x_i * y_i.T
-        except NameError:
-            sum_xi = x_i * x_i.T
-            sum_yi = x_i * y_i.T
+    with open(args['TRAINING_SET'], 'r') as training_file:
+        for line in training_file:
+            x_i, y_i = parse_matrix(line, min_values, max_values)
+            try:
+                sum_xi += x_i * x_i.T
+                sum_yi += x_i * y_i.T
+            except NameError:
+                sum_xi = x_i * x_i.T
+                sum_yi = x_i * y_i.T
     try:
         W = (sum_xi).I * sum_yi # will raise exception if no inverse
     except:
         W = (sum_xi + 0.00001*identity(sum_xi.shape[0])).I * sum_yi
-    training_file.close()
 
-    correct = 0
-    total = 0
-    testing_file = open(args['TESTING_SET'], 'r')
-    for line in testing_file:
-        x_i, y_i = parse_matrix(line, min_values, max_values)
-        prediction = W.T * x_i
-        if argmax(prediction) == argmax(y_i):
-            correct += 1
-        total += 1
-    testing_file.close()
+    with open(args['TESTING_SET'], 'r') as testing_file:
+        correct = 0
+        total = 0
+        for line in testing_file:
+            x_i, y_i = parse_matrix(line, min_values, max_values)
+            prediction = W.T * x_i
+            if argmax(prediction) == argmax(y_i):
+                correct += 1
+            total += 1
     print('Accuracy: {0}%'.format(correct/total * 100))
