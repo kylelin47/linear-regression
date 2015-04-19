@@ -4,7 +4,6 @@
 Options:
     -h --help    show this help message
 """
-
 from docopt import docopt
 
 def scale(filename):

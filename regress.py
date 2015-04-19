@@ -4,8 +4,6 @@
 Options:
     -h --help    show this help message
 """
-import sys
-
 from docopt import docopt
 from numpy import argmax
 from numpy import identity
