@@ -1,5 +1,4 @@
-"""
-Usage:
+"""Usage:
     regress.py TRAINING_SET TESTING_SET
     regress.py -h | --help
 Options:
@@ -23,6 +22,18 @@ def parse_matrix(line, min_values, max_values):
     """Returns the two matrices x_i and y_i needed for linear regression parsed
     from a line containing comma separated data with the first number
     representing the category as an integer.
+
+    min_values should list in order the minimum value for each attribute.
+    max_values should list in order the maximum value for each attribute.
+    If your training data looks like:
+        1,2,3,4
+        0,4,1,5
+    min_values should be [0, 2, 1, 4]
+    max_values should be [1, 4, 3, 5]
+
+    For x_i, each attribute 'a' is scaled according to the passed in lists.
+    [min[a], max[a]] is scaled to [0, 1] and any particular 'a' is set to the
+    representative value on that number line.
     """
     x_i = [1]
     line = line.strip('\n')
@@ -41,10 +52,9 @@ def parse_matrix(line, min_values, max_values):
                                          training set')
         else:
             value = float(value)
-            #scales from [0, 1]
             try:
                 scaled_value = ( (value - min_values[index]) /
-                               (max_values[index] - min_values[index]) )
+                                 (max_values[index] - min_values[index]) )
             except ZeroDivisionError:
                 scaled_value = 1
             x_i.append(scaled_value)

@@ -1,5 +1,4 @@
-"""
-Usage:
+"""Usage:
     scale.py DATA_SET
     scale.py -h | --help
 Options:
