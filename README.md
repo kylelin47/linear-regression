@@ -19,4 +19,8 @@ Example data are in iris and wine folders.
 The training set must contain at least one example of each category present in the testing set.
 
 ## Usage
-regress.py TRAINING_SET TESTING_SET
+```
+> regress.py TRAINING_SET TESTING_SET
+
+Accuracy: n%
+```
