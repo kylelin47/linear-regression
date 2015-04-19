@@ -24,5 +24,6 @@ The training set must contain at least one example of each category present in t
 ```
 > regress.py TRAINING_SET TESTING_SET
 
+Results:  correct/total
 Accuracy: n%
 ```

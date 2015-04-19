@@ -103,4 +103,6 @@ if __name__ == "__main__":
             if argmax(prediction) == argmax(y_i):
                 correct += 1
             total += 1
-    print('Accuracy: {0}%'.format(correct/total * 100))
+
+    print('Results:  {0}/{1}'.format(correct, total))
+    print('Accuracy: {0:.2f}%'.format(correct/total * 100))
