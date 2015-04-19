@@ -7,7 +7,13 @@ A simple linear regression machine learning program, written in Python 3.4.1
 * Docopt: http://www.docopt.org/
 
 ## Data Formatting
-Comma separated numbers, with category being the first number. Example data are in iris and wine folders.
+Comma separated numbers, with category being the first number.
+
+```
+1,5.1,3.5,1.4,0.2
+```
+
+Example data are in iris and wine folders.
 
 ## Usage
 regress.py TRAINING_SET TESTING_SET
