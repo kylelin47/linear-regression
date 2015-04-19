@@ -1,0 +1,14 @@
+The training sets of size n% were derived from the overall data sets
+by the following procedure:
+
+1. Divide the overall set into categories
+2. Select the first n% of the entries (rounding down) in each category
+   and move them from the total data set to the training data set
+3. The remaining data becomes the testing data set
+
+Training            Accuracy
+10%                 42.59%
+20%                 95.14%
+30%                 94.44%
+40%                 97.22%
+50%                 96.67%

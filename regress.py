@@ -61,8 +61,8 @@ def parse_matrix(line, min_values, max_values):
             try:
                 y_i[value-1] = 1
             except:
-                raise DataMismatchError('Category in testing set not found in\
-                                         training set')
+                raise DataMismatchError('More testing set categories than ' +
+                                        'training set categories')
         else:
             value = float(value)
             try:
