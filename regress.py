@@ -8,6 +8,7 @@ Options:
 from docopt import docopt
 from numpy import argmax
 from numpy import identity
+from numpy import linalg
 from numpy import matrix
 from scale import scale
 
@@ -50,7 +51,7 @@ def parse_matrix(line, min_values, max_values):
            0]
     """
     x_i = [1]
-    line = line.strip('\n')
+    line = line.rstrip('\n')
     line_separated = line.split(',')
     for index, value in enumerate(line_separated):
         if index == 0:
@@ -92,7 +93,7 @@ if __name__ == "__main__":
                 sum_yi = x_i * y_i.T
     try:
         W = (sum_xi).I * sum_yi # will raise exception if no inverse
-    except:
+    except linalg.LinAlgError:
         W = (sum_xi + 0.00001*identity(sum_xi.shape[0])).I * sum_yi
     if (args['--verbose']):
         print('W =\n{0}'.format(W))
