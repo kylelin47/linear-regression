@@ -31,4 +31,16 @@ The training set must contain at least one example of each category present in t
 
 Results:  correct/total
 Accuracy: n%
+
+> regress.py TRAINING_SET TESTING_SET --verbose
+
+W =
+[[W1]
+ [W2]
+  .
+  .
+  .
+ [Wm]]
+Results:  correct/total
+Accuracy: n%
 ```

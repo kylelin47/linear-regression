@@ -1,8 +1,9 @@
 """Usage:
-    regress.py TRAINING_SET TESTING_SET
+    regress.py TRAINING_SET TESTING_SET [--verbose]
     regress.py -h | --help
 Options:
     -h --help    show this help message
+    --verbose    print the weight matrix
 """
 from docopt import docopt
 from numpy import argmax
@@ -51,14 +52,14 @@ def parse_matrix(line, min_values, max_values):
     x_i = [1]
     line = line.strip('\n')
     line_separated = line.split(',')
-
     for index, value in enumerate(line_separated):
         if index == 0:
-            if not value.isdigit():
+            try:
+                value = int(value)
+            except ValueError:
                 raise DataMismatchError('Category must be an integer')
-            value = int(value)
             y_i = []
-            for i in range(0, int(max_values[0] - min_values[0] + 1)):
+            for i in range( int(min_values[0]), int(max_values[0]) + 1 ):
                 y_i.append(0)
             try:
                 y_i[value-1] = 1
@@ -74,9 +75,7 @@ def parse_matrix(line, min_values, max_values):
                 scaled_value = 1
             x_i.append(scaled_value)
 
-    x_i = matrix(x_i).T
-    y_i = matrix(y_i).T
-    return x_i, y_i
+    return matrix(x_i).T, matrix(y_i).T
 
 if __name__ == "__main__":
     args = docopt(__doc__)
@@ -95,6 +94,8 @@ if __name__ == "__main__":
         W = (sum_xi).I * sum_yi # will raise exception if no inverse
     except:
         W = (sum_xi + 0.00001*identity(sum_xi.shape[0])).I * sum_yi
+    if (args['--verbose']):
+        print('W =\n{0}'.format(W))
 
     with open(args['TESTING_SET'], 'r') as testing_file:
         correct = 0
