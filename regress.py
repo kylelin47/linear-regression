@@ -54,6 +54,8 @@ def parse_matrix(line, min_values, max_values):
 
     for index, value in enumerate(line_separated):
         if index == 0:
+            if not value.isdigit():
+                raise DataMismatchError('Category must be an integer')
             value = int(value)
             y_i = []
             for i in range(0, int(max_values[0] - min_values[0] + 1)):
