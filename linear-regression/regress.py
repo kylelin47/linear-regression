@@ -65,13 +65,10 @@ def parse_vectors(line, data_scale):
             y_i = []
             for i in range( int(min_values[0]), int(max_values[0]) + 1 ):
                 y_i.append(0)
-            try:
-                if offset < 0:
-                    raise IndexError
-                y_i[offset] = 1
-            except IndexError:
+            if offset < 0 or offset >= len(y_i):
                 raise DataMismatchError('More testing set categories than ' +
                                         'training set categories')
+            y_i[offset] = 1                
         else:
             value = float(value)
             try:
