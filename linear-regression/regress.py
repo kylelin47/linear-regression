@@ -1,9 +1,10 @@
 """Usage:
-    regress.py TRAINING_SET TESTING_SET [-w | --weight]
+    regress.py TRAINING_SET TESTING_SET [-w | --weight] [-v | --verbose]
     regress.py -h | --help
 Options:
-    -h --help    show this help message
-    -w --weight  print the weight matrix
+    -h --help     show this help message
+    -w --weight   print the weight matrix
+    -v --verbose  print per-class accuracy
 """
 from docopt import docopt
 from numpy import argmax
@@ -58,16 +59,16 @@ def parse_vectors(line, data_scale):
     for index, value in enumerate(line_separated):
         if index == 0:
             try:
-                value = int(value) - int(min_values[0])
+                offset = int(value) - int(min_values[0])
             except ValueError:
                 raise DataMismatchError('Category must be an integer')
             y_i = []
             for i in range( int(min_values[0]), int(max_values[0]) + 1 ):
                 y_i.append(0)
             try:
-                if value < 0:
+                if offset < 0:
                     raise IndexError
-                y_i[value] = 1
+                y_i[offset] = 1
             except IndexError:
                 raise DataMismatchError('More testing set categories than ' +
                                         'training set categories')
@@ -84,7 +85,8 @@ def parse_vectors(line, data_scale):
 
 def test_model(testing_filename, weight_matrix, data_scale):
     """Returns the amount of correct predictions and the total number of
-    data entries.
+    data entries along with a dictionary containing as keys the categories
+    and as values a list containing [correct_per_class, total_per_class]
 
     First argument should be a matrix representing the result of minimizing
     the least squares function over some data.
@@ -94,15 +96,24 @@ def test_model(testing_filename, weight_matrix, data_scale):
     The third argument should be a list [min_values, max_values] to scale to.
     """
     with open(testing_filename, 'r') as testing_file:
+        per_class = {}
+        min_category = int(data_scale[0][0])
+        max_category = int(data_scale[1][0])
+        for i in range( min_category, max_category + 1 ):
+            per_class[i] = [0, 0]
         correct = 0
         total = 0
         for line in testing_file:
             x_i, y_i = parse_vectors(line, data_scale)
-            prediction = W.T * x_i
-            if argmax(prediction) == argmax(y_i):
+            prediction = argmax(W.T * x_i)
+            actual = argmax(y_i)
+            if prediction == actual:
                 correct += 1
+                per_class[actual + min_category][0] += 1
+            per_class[actual + min_category][1] += 1
             total += 1
-    return correct, total
+
+    return correct, total, per_class
 
 def weight_matrix(training_filename, get_scale=False):
     """Returns the weight matrix built from the data in the file
@@ -133,9 +144,13 @@ if __name__ == '__main__':
     args = docopt(__doc__)
 
     W, training_scale = weight_matrix(args['TRAINING_SET'], get_scale=True)
-    if (args['--weight']):
+    if args['--weight']:
         print('W =\n{0}'.format(W))
 
-    correct, total = test_model(args['TESTING_SET'], W, training_scale)
+    correct, total, d = test_model(args['TESTING_SET'], W, training_scale)
+    if args['--verbose']:
+        for key in sorted(d):
+            print('Category {0}: {1}/{2}, {3:.2f}%'
+                  .format(key, d[key][0], d[key][1], d[key][0]/d[key][1]*100))
     print('Results:  {0}/{1}'.format(correct, total))
     print('Accuracy: {0:.2f}%'.format(correct/total * 100))

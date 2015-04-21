@@ -27,12 +27,23 @@ W =
  [Wm]]
 Results:  correct/total
 Accuracy: n%
+
+> regress.py TRAINING_SET TESTING_SET --verbose
+Category 1: correct/total, %
+Category 2: correct/total, %
+.
+.
+.
+Category N: correct/total, %
+Results:  correct/total
+Accuracy: n%
 ```
 ## Data Format
 Comma separated numbers, with category being the first number. For example, with 3 categories,
 you can represent each category as 1, 2, or 3. Each entry should be on a new line.
 
-Category must be an integer.
+Category must be an integer. Categories should be in sequence, though it does not have to start
+from 1.
 
 The following data
 
