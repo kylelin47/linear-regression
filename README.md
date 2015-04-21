@@ -17,7 +17,7 @@ Install [setuptools](https://pypi.python.org/pypi/setuptools) then do the follow
 Results:  correct/total
 Accuracy: n%
 
-> regress.py TRAINING_SET TESTING_SET --verbose
+> regress.py TRAINING_SET TESTING_SET --weight
 W =
 [[W1]
  [W2]

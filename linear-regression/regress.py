@@ -1,9 +1,9 @@
 """Usage:
-    regress.py TRAINING_SET TESTING_SET [--verbose]
+    regress.py TRAINING_SET TESTING_SET [-w | --weight]
     regress.py -h | --help
 Options:
     -h --help    show this help message
-    --verbose    print the weight matrix
+    -w --weight  print the weight matrix
 """
 from docopt import docopt
 from numpy import argmax
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         W = (sum_xi).I * sum_yi # will raise exception if no inverse
     except linalg.LinAlgError:
         W = (sum_xi + 0.00001*identity(sum_xi.shape[0])).I * sum_yi
-    if (args['--verbose']):
+    if (args['--weight']):
         print('W =\n{0}'.format(W))
 
     with open(args['TESTING_SET'], 'r') as testing_file:
