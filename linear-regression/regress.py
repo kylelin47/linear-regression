@@ -18,13 +18,14 @@ class DataMismatchError(Exception):
     def __str__(self):
         return repr(self.value)
 
-def parse_matrix(line, min_values, max_values):
+def parse_vectors(line, data_scale):
     """Returns the two vectors x_i and y_i needed for linear regression parsed
     from a line containing comma separated data with the first number
     representing the category as an integer.
 
-    min_values should list in order the minimum value for each attribute.
-    max_values should list in order the maximum value for each attribute.
+    data_scale should be a list [min_values, max_values]
+    min_values should be a list of the minimum values for each attribute.
+    max_values should be a list of the maximum values for each attribute.
     If your training data looks like:
         1,2,3,4
         0,4,1,5
@@ -50,6 +51,7 @@ def parse_matrix(line, min_values, max_values):
            1
            0]
     """
+    min_values, max_values = data_scale
     x_i = [1]
     line = line.rstrip('\n')
     line_separated = line.split(',')
@@ -78,13 +80,39 @@ def parse_matrix(line, min_values, max_values):
 
     return matrix(x_i).T, matrix(y_i).T
 
-if __name__ == "__main__":
-    args = docopt(__doc__)
-    min_values, max_values = scale(args['TRAINING_SET'])
+def test_model(testing_filename, weight_matrix, data_scale):
+    """Returns the amount of correct predictions and the total number of
+    data entries.
 
-    with open(args['TRAINING_SET'], 'r') as training_file:
+    First argument should be a matrix representing the result of minimizing
+    the least squares function over some data.
+
+    The second argument should be the name of the data file to test.
+
+    The third argument should be a list [min_values, max_values] to scale to.
+    """
+    with open(testing_filename, 'r') as testing_file:
+        correct = 0
+        total = 0
+        for line in testing_file:
+            x_i, y_i = parse_vectors(line, data_scale)
+            prediction = W.T * x_i
+            if argmax(prediction) == argmax(y_i):
+                correct += 1
+            total += 1
+    return correct, total
+
+def weight_matrix(training_filename, get_scale=False):
+    """Returns the weight matrix built from the data in the file
+    at the filename given as the first argument, scaled according to
+    the values in the file.
+
+    Optionally, you can set get_scale=True to also have the scale returned.
+    """
+    training_scale = scale(training_filename)
+    with open(training_filename, 'r') as training_file:
         for line in training_file:
-            x_i, y_i = parse_matrix(line, min_values, max_values)
+            x_i, y_i = parse_vectors(line, training_scale)
             try:
                 sum_xi += x_i * x_i.T
                 sum_yi += x_i * y_i.T
@@ -95,18 +123,17 @@ if __name__ == "__main__":
         W = (sum_xi).I * sum_yi # will raise exception if no inverse
     except linalg.LinAlgError:
         W = (sum_xi + 0.00001*identity(sum_xi.shape[0])).I * sum_yi
+    if get_scale:
+        return W, training_scale
+    return W
+
+if __name__ == '__main__':
+    args = docopt(__doc__)
+
+    W, training_scale = weight_matrix(args['TRAINING_SET'], get_scale=True)
     if (args['--weight']):
         print('W =\n{0}'.format(W))
 
-    with open(args['TESTING_SET'], 'r') as testing_file:
-        correct = 0
-        total = 0
-        for line in testing_file:
-            x_i, y_i = parse_matrix(line, min_values, max_values)
-            prediction = W.T * x_i
-            if argmax(prediction) == argmax(y_i):
-                correct += 1
-            total += 1
-
+    correct, total = test_model(args['TESTING_SET'], W, training_scale)
     print('Results:  {0}/{1}'.format(correct, total))
     print('Accuracy: {0:.2f}%'.format(correct/total * 100))

@@ -7,10 +7,10 @@ Options:
 from docopt import docopt
 
 def scale(filename):
-    """Returns two lists, the first containing the minimum and the second
-    containing the maximum values of the attributes.
+    """Returns a list, the first element being the list of minimum
+    and the second being the list of maximum values of the attributes.
 
-    The index represents which attribute.
+    The index of a nested list represents which attribute.
     """
     min_values = []
     max_values = []
@@ -27,7 +27,7 @@ def scale(filename):
                     min_values[index] = value
                 if value > max_values[index]:
                     max_values[index] = value
-    return min_values, max_values
+    return [min_values, max_values]
 
 if __name__ == "__main__":
     args = docopt(__doc__)
