@@ -58,15 +58,17 @@ def parse_vectors(line, data_scale):
     for index, value in enumerate(line_separated):
         if index == 0:
             try:
-                value = int(value)
+                value = int(value) - int(min_values[0])
             except ValueError:
                 raise DataMismatchError('Category must be an integer')
             y_i = []
             for i in range( int(min_values[0]), int(max_values[0]) + 1 ):
                 y_i.append(0)
             try:
-                y_i[value-1] = 1
-            except:
+                if value < 0:
+                    raise IndexError
+                y_i[value] = 1
+            except IndexError:
                 raise DataMismatchError('More testing set categories than ' +
                                         'training set categories')
         else:
