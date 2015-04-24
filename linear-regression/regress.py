@@ -34,6 +34,7 @@ def parse_vectors(line, data_scale, delim=','):
         0,4,1,5
     min_values should be [0, 2, 1, 4]
     max_values should be [1, 4, 3, 5]
+    'None' can be given as a placeholder and that attribute will not be scaled.
 
     For x_i, each attribute 'a' is scaled according to the passed in lists.
     [min[a], max[a]] is scaled to [0, 1] and any particular 'a' is set to the
@@ -76,11 +77,13 @@ def parse_vectors(line, data_scale, delim=','):
             try:
                 scaled_value = ( (value - min_values[index]) /
                                  (max_values[index] - min_values[index]) )
-                x_i.append(scaled_value)
             except ZeroDivisionError:
-                x_i.append(1)
+                scaled_value = 1
             except IndexError:
-                x_i.append(value) # too many attributes on this line to scale.
+                scaled_value = value # too many attributes to scale.
+            except TypeError:
+                scaled_value = value # None/other invalid given as scale
+            x_i.append(scaled_value)
 
     return matrix(x_i).T, matrix(y_i).T
 
@@ -94,7 +97,8 @@ def test_model(testing_filename, weight_matrix, data_scale, delim=','):
 
     The second argument should be the name of the data file to test.
 
-    The third argument should be a list [min_values, max_values] to scale to.
+    The third argument should be a list [min_values, max_values] to scale to,
+    including the category.
     """
     with open(testing_filename, 'r') as testing_file:
         per_class = {}
@@ -127,7 +131,7 @@ def weight_matrix(training_filename, get_scale=False, delim=','):
     Optionally, you can set get_scale=True to also have the scale returned.
     delim specifies how the data is delimited.
     """
-    training_scale = scale(training_filename, delim)
+    training_scale = scale(training_filename, delim).list_repr
     with open(training_filename, 'r') as training_file:
         for line in training_file:
             x_i, y_i = parse_vectors(line, training_scale, delim)
