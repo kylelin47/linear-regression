@@ -7,8 +7,13 @@ Options:
 from docopt import docopt
 
 class Scale:
-    """Initialized with two lists that represent the min_values scale and the
-    max_values scale
+    """
+    Scale(min_values, max_values)
+
+    Returns a scale from two lists that represent the min_values scale and the
+    max_values scale that can be thought of simply as a list of lists:
+
+    [min_values, max_values]
     """
     def __init__(self, min_values, max_values):
         if len(min_values) == len(max_values):
@@ -49,7 +54,8 @@ class Scale:
 
 
 def scale(filename, delim=','):
-    """Returns a Scale, the min_values element being the list of minimum
+    """
+    Returns a Scale, the min_values element being the list of minimum
     and the max_values element being the list of maximum values of the
     attributes.
 

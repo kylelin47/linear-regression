@@ -22,7 +22,8 @@ class DataMismatchError(Exception):
         return repr(self.value)
 
 def parse_vectors(line, data_scale, delim=','):
-    """Returns the two vectors x_i and y_i needed for linear regression parsed
+    """
+    Returns the two vectors x_i and y_i needed for linear regression parsed
     from a line containing delimiter separated data with the first number
     representing the category as an integer.
 
@@ -88,7 +89,8 @@ def parse_vectors(line, data_scale, delim=','):
     return matrix(x_i).T, matrix(y_i).T
 
 def test_model(testing_filename, weight_matrix, data_scale, delim=','):
-    """Returns the amount of correct predictions and the total number of
+    """
+    Returns the amount of correct predictions and the total number of
     data entries along with a dictionary containing as keys the categories
     and as values a list containing [correct_per_class, total_per_class]
 
@@ -124,7 +126,8 @@ def test_model(testing_filename, weight_matrix, data_scale, delim=','):
     return correct, total, per_class
 
 def weight_matrix(training_filename, get_scale=False, delim=','):
-    """Returns the weight matrix built from the data in the file
+    """
+    Returns the weight matrix built from the data in the file
     at the filename given as the first argument, scaled according to
     the values in the file.
 
