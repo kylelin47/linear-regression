@@ -6,7 +6,7 @@ Options:
 """
 from docopt import docopt
 
-def scale(filename):
+def scale(filename, delim=','):
     """Returns a list, the first element being the list of minimum
     and the second being the list of maximum values of the attributes.
 
@@ -17,7 +17,7 @@ def scale(filename):
     with open(filename, 'r') as f:
         for line in f:
             line = line.strip('\n')
-            line_separated = line.split(',')
+            line_separated = line.split(delim)
             for index, value in enumerate(line_separated):
                 if len(min_values) <= index:
                     min_values.append(float('inf'))

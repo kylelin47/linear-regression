@@ -1,10 +1,12 @@
 """Usage:
     regress.py TRAINING_SET TESTING_SET [-w | --weight] [-v | --verbose]
+                                        [--delimiter=<str>]
     regress.py -h | --help
 Options:
-    -h --help     show this help message
-    -w --weight   print the weight matrix
-    -v --verbose  print per-class accuracy
+    -h --help          show this help message
+    -w --weight        print the weight matrix
+    -v --verbose       print per-class accuracy
+    --delimiter=<str>  delimiter to split at [default: ,]
 """
 from docopt import docopt
 from numpy import argmax
@@ -19,9 +21,9 @@ class DataMismatchError(Exception):
     def __str__(self):
         return repr(self.value)
 
-def parse_vectors(line, data_scale):
+def parse_vectors(line, data_scale, delim=','):
     """Returns the two vectors x_i and y_i needed for linear regression parsed
-    from a line containing comma separated data with the first number
+    from a line containing delimiter separated data with the first number
     representing the category as an integer.
 
     data_scale should be a list [min_values, max_values]
@@ -55,7 +57,7 @@ def parse_vectors(line, data_scale):
     min_values, max_values = data_scale
     x_i = [1]
     line = line.rstrip('\n')
-    line_separated = line.split(',')
+    line_separated = line.split(delim)
     for index, value in enumerate(line_separated):
         if index == 0:
             try:
@@ -74,13 +76,15 @@ def parse_vectors(line, data_scale):
             try:
                 scaled_value = ( (value - min_values[index]) /
                                  (max_values[index] - min_values[index]) )
+                x_i.append(scaled_value)
             except ZeroDivisionError:
-                scaled_value = 1
-            x_i.append(scaled_value)
+                x_i.append(1)
+            except IndexError:
+                x_i.append(1) # too many attributes on this line to scale.
 
     return matrix(x_i).T, matrix(y_i).T
 
-def test_model(testing_filename, weight_matrix, data_scale):
+def test_model(testing_filename, weight_matrix, data_scale, delim=','):
     """Returns the amount of correct predictions and the total number of
     data entries along with a dictionary containing as keys the categories
     and as values a list containing [correct_per_class, total_per_class]
@@ -101,34 +105,46 @@ def test_model(testing_filename, weight_matrix, data_scale):
         correct = 0
         total = 0
         for line in testing_file:
-            x_i, y_i = parse_vectors(line, data_scale)
-            prediction = argmax(W.T * x_i)
-            actual = argmax(y_i)
-            if prediction == actual:
-                correct += 1
-                per_class[actual + min_category][0] += 1
-            per_class[actual + min_category][1] += 1
-            total += 1
+            x_i, y_i = parse_vectors(line, data_scale, delim)
+            try:
+                prediction = argmax(W.T * x_i)
+                actual = argmax(y_i)
+                if prediction == actual:
+                    correct += 1
+                    per_class[actual + min_category][0] += 1
+                per_class[actual + min_category][1] += 1
+                total += 1
+            except ValueError:
+                pass
 
     return correct, total, per_class
 
-def weight_matrix(training_filename, get_scale=False):
+def weight_matrix(training_filename, get_scale=False, delim=','):
     """Returns the weight matrix built from the data in the file
     at the filename given as the first argument, scaled according to
     the values in the file.
 
     Optionally, you can set get_scale=True to also have the scale returned.
+    delim specifies how the data is delimited.
     """
-    training_scale = scale(training_filename)
+    training_scale = scale(training_filename, delim)
     with open(training_filename, 'r') as training_file:
         for line in training_file:
-            x_i, y_i = parse_vectors(line, training_scale)
+            x_i, y_i = parse_vectors(line, training_scale, delim)
             try:
                 sum_xi += x_i * x_i.T
                 sum_yi += x_i * y_i.T
-            except NameError:
+            except NameError: # first pass
                 sum_xi = x_i * x_i.T
                 sum_yi = x_i * y_i.T
+            except ValueError: # row has differing number of attributes
+                if sum_xi.shape[0] < x_i.shape[0]:
+                    # more attributes, use this as the standard
+                    sum_xi = x_i * x_i.T
+                    sum_yi = x_i * y_i.T
+                else:
+                    # less attributes, ignore it
+                    pass
     try:
         W = (sum_xi).I * sum_yi # will raise exception if no inverse
     except linalg.LinAlgError:
@@ -139,12 +155,15 @@ def weight_matrix(training_filename, get_scale=False):
 
 if __name__ == '__main__':
     args = docopt(__doc__)
+    delimiter = args['--delimiter']
 
-    W, training_scale = weight_matrix(args['TRAINING_SET'], get_scale=True)
+    W, training_scale = weight_matrix(args['TRAINING_SET'], get_scale=True,
+                                      delim=delimiter)
     if args['--weight']:
         print('W =\n{0}'.format(W))
 
-    correct, total, d = test_model(args['TESTING_SET'], W, training_scale)
+    correct, total, d = test_model(args['TESTING_SET'], W, training_scale,
+                                   delim=delimiter)
     if args['--verbose']:
         for key in sorted(d):
             print('Category {0}: {1}/{2}, {3:.2f}%'
