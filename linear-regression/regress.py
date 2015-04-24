@@ -80,7 +80,7 @@ def parse_vectors(line, data_scale, delim=','):
             except ZeroDivisionError:
                 x_i.append(1)
             except IndexError:
-                x_i.append(1) # too many attributes on this line to scale.
+                x_i.append(value) # too many attributes on this line to scale.
 
     return matrix(x_i).T, matrix(y_i).T
 
