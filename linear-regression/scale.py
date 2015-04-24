@@ -7,21 +7,28 @@ Options:
 from docopt import docopt
 
 class Scale:
+    """Initialized with two lists that represent the min_values scale and the
+    max_values scale
+    """
     def __init__(self, min_values, max_values):
         if len(min_values) == len(max_values):
-            try:
-                for value in min_values:
-                    float(value)
-                for value in max_values:
-                    float(value)
-            except ValueError:
+            if self.is_floats(min_values) and self.is_floats(max_values):
+                self._min_values = min_values
+                self._max_values = max_values
+            else:
                 raise ValueError('Scales must be representable as floats')
-            self._min_values = min_values
-            self._max_values = max_values
         else:
             raise ValueError('Scales do not match in size')
     def __str__(self):
         return repr([self.min_values, self.max_values])
+    def __getitem__(self, key):
+        if key is 0:
+            return self.min_values
+        elif key is 1:
+            return self.max_values
+        else:
+            raise IndexError('list index out of range')
+
     @property
     def min_values(self):
         return self._min_values
@@ -31,6 +38,14 @@ class Scale:
     @property
     def list_repr(self):
         return [self.min_values, self.max_values]
+
+    def is_floats(self, values):
+        for value in values:
+            try:
+                float(value)
+            except ValueError:
+                return False
+        return True
 
 
 def scale(filename, delim=','):
