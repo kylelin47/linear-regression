@@ -8,7 +8,10 @@ A simple linear regression machine learning program, written in Python 3.4.1
 
 You should not have to install these manually if you follow the instructions under 'Installation'.
 ## Installation
-Install [setuptools](https://pypi.python.org/pypi/setuptools) then do the following:
+1. Get the files within this repository. For example: git clone https://github.com/kylelin47/linear-regression.git
+2. Install [setuptools](https://pypi.python.org/pypi/setuptools)
+3. Navigate to where you saved this repository on your computer (you should see the file setup.py)
+4. Run
 ```
 > setup.py install
 ```
