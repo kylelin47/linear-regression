@@ -6,6 +6,7 @@ A simple linear regression machine learning program, written in Python 3.4.1
 * Numpy: http://www.numpy.org/
 * Docopt: http://www.docopt.org/
 
+You should not have to install these manually if you follow the instructions under 'Installation'.
 ## Installation
 Install [setuptools](https://pypi.python.org/pypi/setuptools) then do the following:
 ```
