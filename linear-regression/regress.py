@@ -13,6 +13,7 @@ from numpy import argmax
 from numpy import identity
 from numpy import linalg
 from numpy import matrix
+
 from scale import scale
 
 class DataMismatchError(Exception):
@@ -23,38 +24,10 @@ class DataMismatchError(Exception):
 
 def parse_vectors(line, data_scale, delim=','):
     """
-    Returns the two vectors x_i and y_i needed for linear regression parsed
-    from a line containing delimiter separated data with the first number
-    representing the category as an integer.
+    Returns the two vectors x_i and y_i needed for linear regression from
+    a data line
 
-    data_scale should be a list [min_values, max_values]
-    min_values should be a list of the minimum values for each attribute.
-    max_values should be a list of the maximum values for each attribute.
-    If your training data looks like:
-        1,2,3,4
-        0,4,1,5
-    min_values should be [0, 2, 1, 4]
-    max_values should be [1, 4, 3, 5]
-    'None' can be given as a placeholder and that attribute will not be scaled.
-
-    For x_i, each attribute 'a' is scaled according to the passed in lists.
-    [min[a], max[a]] is scaled to [0, 1] and any particular 'a' is set to the
-    representative value on that number line.
-    x_i then becomes a vector of scaled attributes, with a 1 at the top
-    for offset purposes.
-    x_i = [1
-           scaled_a1
-           scaled_a2
-           scaled_a3
-           ...
-           scaled_an]
-
-    y_i is a vector of (max_values[0] - min_values[0] + 1) entries where
-    every entry except line[0] equals 0, and the line[0] entry equals 1.
-    For example, if min_values[0] == 1 and max_values[0] == 3 and line[0] == 2
-    y_i = [0
-           1
-           0]
+    data_scale should be a scale. See scale.py
     """
     min_values, max_values = data_scale
     x_i = [1]
@@ -70,7 +43,7 @@ def parse_vectors(line, data_scale, delim=','):
             for i in range( int(min_values[0]), int(max_values[0]) + 1 ):
                 y_i.append(0)
             if offset < 0 or offset >= len(y_i):
-                raise DataMismatchError('More testing set categories than ' +
+                raise DataMismatchError('More testing set categories than '
                                         'training set categories')
             y_i[offset] = 1                
         else:
@@ -93,14 +66,6 @@ def test_model(testing_filename, weight_matrix, data_scale, delim=','):
     Returns the amount of correct predictions and the total number of
     data entries along with a dictionary containing as keys the categories
     and as values a list containing [correct_per_class, total_per_class]
-
-    First argument should be a matrix representing the result of minimizing
-    the least squares function over some data.
-
-    The second argument should be the name of the data file to test.
-
-    The third argument should be a list [min_values, max_values] to scale to,
-    including the category.
     """
     with open(testing_filename, 'r') as testing_file:
         per_class = {}
@@ -130,18 +95,15 @@ def weight_matrix(training_filename, get_scale=False, delim=','):
     Returns the weight matrix built from the data in the file
     at the filename given as the first argument, scaled according to
     the values in the file.
-
-    Optionally, you can set get_scale=True to also have the scale returned.
-    delim specifies how the data is delimited.
     """
-    training_scale = scale(training_filename, delim).list_repr
+    training_scale = scale(training_filename, delim)
     with open(training_filename, 'r') as training_file:
         for line in training_file:
             x_i, y_i = parse_vectors(line, training_scale, delim)
             try:
                 sum_xi += x_i * x_i.T
                 sum_yi += x_i * y_i.T
-            except NameError: # first pass
+            except NameError:
                 sum_xi = x_i * x_i.T
                 sum_yi = x_i * y_i.T
             except ValueError: # row has differing number of attributes
@@ -153,7 +115,7 @@ def weight_matrix(training_filename, get_scale=False, delim=','):
                     # less attributes, ignore it
                     pass
     try:
-        W = (sum_xi).I * sum_yi # will raise exception if no inverse
+        W = sum_xi.I * sum_yi # will raise exception if no inverse
     except linalg.LinAlgError:
         W = (sum_xi + 0.00001*identity(sum_xi.shape[0])).I * sum_yi
     if get_scale:
@@ -173,7 +135,7 @@ if __name__ == '__main__':
                                    delim=delimiter)
     if args['--verbose']:
         for key in sorted(d):
-            print('Category {0}: {1}/{2}, {3:.2f}%'
-                  .format(key, d[key][0], d[key][1], d[key][0]/d[key][1]*100))
+            print('Category {0}: {1}/{2}, {3:.2%}'.format(
+                key, d[key][0], d[key][1], d[key][0]/d[key][1]))
     print('Results:  {0}/{1}'.format(correct, total))
-    print('Accuracy: {0:.2f}%'.format(correct/total * 100))
+    print('Accuracy: {0:.2%}'.format(correct/total))

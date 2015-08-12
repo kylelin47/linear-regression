@@ -24,15 +24,17 @@ class Scale:
                 raise ValueError('Scales must be representable as floats')
         else:
             raise ValueError('Scales do not match in size')
+
     def __str__(self):
         return repr([self.min_values, self.max_values])
+
     def __getitem__(self, key):
         if key is 0:
             return self.min_values
         elif key is 1:
             return self.max_values
         else:
-            raise IndexError('list index out of range')
+            raise IndexError('List index out of range')
 
     @property
     def min_values(self):
