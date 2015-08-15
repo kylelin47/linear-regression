@@ -1,13 +1,12 @@
-from setuptools import find_packages, setup
+from setuptools import setup
 
 setup(
-    name='linear-regression',
+    name='regress',
     version='0.1',
     install_requires=[
-        'Numpy ==1.8.1',
-        'Docopt ==0.6.1',
+        'numpy ==1.9.2',
+        'docopt ==0.6.2',
     ],
-    packages=find_packages(),
     scripts=[
         'linear-regression/regress.py',
         'linear-regression/scale.py',

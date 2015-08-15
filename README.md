@@ -1,5 +1,5 @@
 # linear-regression
-A simple linear regression machine learning program, written in Python 3.4.1
+A simple linear regression machine learning program, written in Python 3.4
 
 ## Dependencies
 * Numpy: http://www.numpy.org/
@@ -12,7 +12,8 @@ You should not have to install these manually if you follow the instructions und
 3. Install [setuptools](https://pypi.python.org/pypi/setuptools)
 4. Run
 ```
-> setup.py install
+> python setup.py install
+# do not use 'pip install .', this is just a script
 ```
 ## Training Sets and Testing Sets
 regress.py will use the training set to learn a weight matrix that it will apply to the attributes
