@@ -11,10 +11,13 @@ You should not have to install these manually if you follow the instructions und
 2. In a command prompt, navigate to where you saved this repository on your computer. You should see the file setup.py.
 3. Install [setuptools](https://pypi.python.org/pypi/setuptools)
 4. Run
-```
-> python setup.py install
-# do not use 'pip install .', this is just a script
-```
+
+ ```
+ > python setup.py install
+ # do not use 'pip install .', this is just a script
+ ```
+5. You should now be able to run 'regress.py' directly
+
 ## Training Sets and Testing Sets
 regress.py will use the training set to learn a weight matrix that it will apply to the attributes
 of each entry in the testing set to predict that entry's category. It will compare its prediction to
